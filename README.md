@@ -1,1 +1,1 @@
-CS201 project
+Chatify
