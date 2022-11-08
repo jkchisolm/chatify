@@ -1,18 +1,3 @@
-// document
-//   .getElementsByClassName("submitButton")[0]
-//   .addEventListener("click", () => {
-//     let username = documents.getElementById(username).value;
-//     let password = documents.getElementById(password).value;
-//     let confirmPassword = documents.getElementById(confirmPassword).value;
-
-//     // verify that password and confirm password are the same
-//     if (password !== confirmPassword) {
-//       alert("Passwords do not match");
-//       return;
-//     }
-//     alert("Registered user (placeholder)");
-//   });
-
 const registerUser = () => {
   let username = document.getElementById("username").value;
   let password = document.getElementById("password").value;

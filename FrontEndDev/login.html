@@ -11,7 +11,7 @@
   <body>
     <div class="container">
       <h1 class="heading">Login</h1>
-      <form action="submit" class="login-form">
+      <form class="login-form">
         <div class="form-group">
           <input
             type="text"
@@ -28,7 +28,9 @@
             placeholder="Password"
           />
         </div>
-        <button class="submitButton">Let's go</button>
+        <button class="submitButton" type="button" onClick="loginUser()">
+          Let's go
+        </button>
       </form>
       <div class="signupSection">
         <p class="signupText">Don't have an account?</p>
@@ -37,4 +39,5 @@
       </div>
     </div>
   </body>
+  <script type="text/javascript" src="assets/login.js"></script>
 </html>
