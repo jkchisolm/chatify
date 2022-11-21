@@ -22,6 +22,6 @@ var x = setInterval(function() {
   // If the count down is over, write some text 
   if (distance < 0) {
     clearInterval(x);
-    document.getElementById("countDownClock").innerHTML = "EXPIRED";
+    document.getElementById("countDownClock").innerHTML = "It's matchin time";
   }
 }, 1000);
