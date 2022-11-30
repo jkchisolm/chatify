@@ -164,3 +164,7 @@
   .msgln b.user-name-left {
     background: orangered;
   }
+
+  .usernameForChat{
+      margin-left: 8px;
+  }
