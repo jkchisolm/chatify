@@ -7,12 +7,13 @@
     <link rel="stylesheet" href="assets/chat.css" />
     <title>Chatify</title>
 </head>
-<body>
+<body onload = "connectToServer()">
     <div id="wrapper">
         <div id="menu">
-            <p class="welcome">Welcome to Chatify! You matched with <strong>user1</strong> and had a <strong>80%</strong> similarity in music taste<b></b></p>
+            <p>Welcome to Chatify! You had matched with <br> </p>
+            <p type="text" id="usernameForChat" name="someInput"></p> 
+
             
-            <p class="logout"><a id="exit" href="#">Exit Chat</a></p>
         </div>
 
         <div id="chatbox"></div>
@@ -26,6 +27,9 @@
     <script type="text/javascript">
         // jQuery Document
         $(document).ready(function () {});
+        var usernamedummy = " this is a username"
+        var UserName = localStorage.getItem('username');
+        document.getElementById("usernameForChat").innerHTML = usernamedummy;
     </script>
 </body>
 </html>
