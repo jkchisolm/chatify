@@ -1,20 +1,28 @@
 const AUTHORIZE = "https://accounts.spotify.com/authorize";
 const TOKEN = "https://accounts.spotify.com/api/token";
 const TOPTRACKS = "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=0";
-const TOPTRACKSLONG = "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=25&offset=0";
+const TOPTRACKSLONG = "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=15&offset=0";
 const TOPARTISTS = "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=10&offset=0";
 
-var client_id = "22c5bff3962849c0b67a578d315b5e24";
-var client_secret = "9e6f35c06c1447deabb7035de0750f52";
-var redirect_uri = "http://127.0.0.1:5500/index.html";
+var client_id = "99c9c603516948c98cbe088a6306be21"; // chatify
+var client_secret = "f9a787a2c6824a0898fb97ac3d2a6bb5";
+var redirect_uri = "http://127.0.0.1:5500/index.html"; // get URI
 var access_token = null;
 var refresh_token = null;
 
-var mysql = require('mysql');
+// JSON string that contains an array "items" of objects 
+// each object contains track title, artist name, and album cover image url
+var topTenTracks = "";
 
-const topTenTracks = [];
-const topTenArtists = [];
+// JSON string that contains an array "items" of objects
+// each object contains artist name and artist image url
+var topTenArtists = "";
+
+// JSON string
+// strings containing genre
+var topFiveGenres = ""; 
 const genreMap = new Map(); // key = genre; value = number of times it appears
+
 
 function onPageLoad() {
     if (window.location.search.length > 0) {
@@ -26,6 +34,9 @@ function onPageLoad() {
         } else {
             // we have an access token so move on
             document.getElementById("loginSection").style.display = 'block';
+            getUserTopArtists();
+            getUserTopTracks();
+            getUserTopGenres();
         }
     }
 }
@@ -77,7 +88,7 @@ function callAuthorizationApi(body) {
 function handleAuthorizationResponse() {
     if (this.status == 200) {
         var data = JSON.parse(this.responseText);
-        console.log(data);
+        // console.log(data);
         var data = JSON.parse(this.responseText);
         if (data.access_token != undefined) {
             access_token = data.access_token;
@@ -109,18 +120,16 @@ function callApi(method, url, body, callback) {
 }
 
 // get user's recent favorite tracks
-// track title, artist name, album cover
 function getUserTopTracks() {
     callApi("GET", TOPTRACKS, null, userTopTracks); // short_term
 }
 
-// get user's favorite track of all time; use this to extract favorite genres
-function getUserTopTracksLong() {
-    callApi("GET", TOPTRACKSLONG, null, userTopTracks); //long_term
+// get user's top 5 genres of all time
+function getUserTopGenres() {
+    callApi("GET", TOPTRACKSLONG, null, userTopArtists); //long_term
 }
 
 // get user's favorite artists of all time
-// name and image of artist
 function getUserTopArtists() {
     callApi("GET", TOPARTISTS, null, userTopArtists); //long_term
 }
@@ -130,24 +139,75 @@ function userTopArtists() {
     if (this.status == 200) {
         var data = JSON.parse(this.responseText);
         const items = data.items; //array of JSON objects 
-        for (let i = 0; i < items.length; i++) {
+        const topTen = [];
+        
+        // top artists 
+        if(items.length == 10) {
+            for (let i = 0; i < items.length; i++) {
 
-            // parse each JSON object in the items array
-            var artist = JSON.parse(items[i]);
-            const temp = [];
+                // parse each JSON object in the items array
+                var nameVar = "";
+                var imageUrl = "";
+    
+                // get artist's name
+                nameVar = (items[i]).name;
+    
+                // get artist image
+                const images = (items[i]).images;
+                if( (images != undefined) && (images.length != 0) ) {
+                    imageUrl = images[0].url;
+                }
+    
+                // add artist's info to list
+                const obj = {name: nameVar, image: imageUrl};
+                // topTen.push(JSON.stringify(obj)); // <-- JSON OF JSON OBJECTS
+                topTen.push(obj); // <-- JSON OF OBJECTS
+            }
+            const obj = {items: topTen};
+            topTenArtists = JSON.stringify(obj);
 
-            // get artist's name
-            temp.push(artist.name);
+            console.log(topTenArtists);
+            var d = JSON.parse(topTenArtists);
+            var i = d.items;
+            console.log(i[1].name);
+        }
+        else if(items.length == 15) {
 
-            // get artist image
-            const images = artist.images;
-            if( (images != undefined) && (images.length != 0) ) {
-                const image = JSON.parse(images[0]);
-                temp.push(image.url);
+            // get genres and the number of times they occur
+            for(let i = 0; i < 15; i++) {
+                // console.log(items[i]);
+                const genres = (items[i]).genres; // array of strings
+                for (let j = 0; j < genres.length; j++) {
+                    if (genreMap.has(genres[j])) {
+                        genreMap.set( genres[j], (genreMap.get(genres[j]) + 1) ); 
+                    }
+                    else {
+                        genreMap.set(genres[j], 1);
+                    }
+                }
             }
 
-            // add artist's info to list
-            topTenArtists.push(temp);
+            // sort genres (top 5 only) from 1 to 5
+            const topFiveKey = [];
+            for(const [key, value] of genreMap) {
+
+                var max = 0; 
+                var theKey = "";
+                for (const [key, value] of genreMap) {
+                    if(value > max) { 
+                        max = value;
+                        theKey = key;
+                    }
+                }
+                topFiveKey.push(theKey);
+                genreMap.delete(theKey);
+                if(topFiveKey.length == 5) break;
+            }
+
+            const obj = {one: topFiveKey[0], two: topFiveKey[1], three: topFiveKey[2], four: topFiveKey[3], five: topFiveKey[4]};
+            topFiveGenres = JSON.stringify(obj);
+
+            console.log(topFiveGenres);
         }
     } else if (this.status == 401) {
         refreshAccessToken();
@@ -162,49 +222,32 @@ function userTopTracks() {
     if (this.status == 200) {
         var data = JSON.parse(this.responseText);
         const items = data.items; //array of JSON objects (tracks)
+        const topTen = [];
         
         // top 10 songs in the past 4 weeks
-        if(items.length == 10) {
-            for (let i = 0; i < 10; i++) {
-                const temp = []; 
+        for (let i = 0; i < 10; i++) {
+            // const temp = []; 
 
-                // parse each JSON object in the array; get top 10 songs
-                var track = JSON.parse(items[i]);
-                temp.push(track.name); // song title
+            // get the track title
+            var trackTitle = (items[i]).name;
 
-                // get array of all artists' names
-                const artists = track.artist; 
-                const temp2 = [];
-                for(let j = 0; j < artists.length; j++) {
-                    var artist = JSON.parse(artists[j]);
-                    temp2.push(artist.name); // push name of all artists on the track
-                }
-                temp.push(temp2);
+            // get array of all artists' names
+            const artists = (items[i]).artists; 
+            var artistName = artists[0].name; // only get the first artists' name for simplicity
 
-                // get URL of album cover
-                const album = JSON.parse(track.album)
-                const images = album.images;
-                if(images != undefined && (images.length != 0)) {
-                    const image = JSON.parse(images[0]);
-                    temp.push(image.url);
-                }
+            // get URL of album cover
+            const album = items[i].album;
+            const images = album.images;
+            var imageUrl = images[0].url;
 
-                // add array of track info to the list
-                topTenTracks.push(temp); 
-            }
+            // add array of track info to the list
+            const obj = {track: trackTitle, artist: artistName, image: imageUrl};
+            // topTen.push(JSON.stringify(obj)); // <-- JSON OF JSON OBJECTS
+            topTen.push(obj);
         }
-        else if(items.length == 25) {
-
-            // get genres and the number of times they occur
-            for(let i = 0; i < 25; i++) {
-                var track = JSON.parse(items[i]);
-                const genres = track.genres; // array of strings
-                for (let j = 0; j < genres.length; j++) {
-                    if (genreMap.has(genres[j])) genreMap.get(genres[j]) = genreMap.get(genres[j]) + 1;
-                    else genreMap.set(genres[j], 1);
-                }
-            }
-        }
+        const obj = {items: topTen};
+        topTenTracks = JSON.stringify(obj);
+        console.log(topTenTracks);
     } 
     else if (this.status == 401) {
         refreshAccessToken();

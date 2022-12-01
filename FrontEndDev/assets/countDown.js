@@ -1,4 +1,4 @@
-var countDownDate = new Date("Nov 8, 2022 15:37:25").getTime();
+var countDownDate = new Date("Nov 29, 2022 21:54:00").getTime();
 
 // Update the count down every 1 second
 var x = setInterval(function() {
@@ -23,5 +23,10 @@ var x = setInterval(function() {
   if (distance < 0) {
     clearInterval(x);
     document.getElementById("countDownClock").innerHTML = "It's matchin time";
+    document.getElementById("cdPara").innerHTML = "";
+
+    setTimeout(function() {
+      window.location.href = "chat.html";
+    }, 3000);
   }
 }, 1000);
