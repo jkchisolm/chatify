@@ -22,13 +22,13 @@ public class SignupServlet extends HttpServlet {
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+//		response.getWriter().append("Served at: ").append(request.getContextPath());
 		PrintWriter out = response.getWriter();
 		String user = request.getParameter("user");
 		String pass = request.getParameter("pass");
 		String pass2 = request.getParameter("pass2");
 		
-		updateData(user,pass,pass2);
+		int status = updateData(user,pass,pass2);
 		
 		System.out.println("username = " + user);
 		System.out.println("pass = " + pass);
@@ -36,13 +36,14 @@ public class SignupServlet extends HttpServlet {
 		
 		response.setContentType("application/json");
 		out.println("{");
-		out.println("\"Username\":" + "\"" + user + "\",");
-		out.println("\"Password\":" + "\"" + pass + "\"");
-		out.println("\"Password\":" + "\"" + pass2 + "\"");
+		out.println("\"username\":" + "\"" + user + "\",");
+		out.println("\"password\":" + "\"" + pass + "\",");
+		out.println("\"confirmPassword\":" + "\"" + pass2 + "\",");
+		out.println("\"status\":" + "\"" + status + "\"");
 		out.println("}");
 	}
 	
-    public void updateData(String user, String pass, String pass2) {	
+    public int updateData(String user, String pass, String pass2) {
     	Connection conn = null;
 		Statement st = null;
 		ResultSet rs = null;
@@ -65,24 +66,28 @@ public class SignupServlet extends HttpServlet {
 			
 			if(!validSignup(user, pass, pass2)) {
 				System.out.println("Username is taken");
+				return -1;
 			}
 			else if(user.length() >= 4 && pass.length() >= 8) {
 				rs.moveToInsertRow();
 				rs.updateString("username", user);
 				rs.updateString("password", pass);
 				rs.insertRow();
-				rs.moveToCurrentRow();				
+				rs.moveToCurrentRow();
+				return 1;
 			} 
 			else if (pass.length() < 8){
 				System.out.println("Password needs to be 8 characters");
+				return -2;
 			}
 			else if (user.length() < 4) {
 				System.out.println("Username needs to be 4 characters");
+				return -3;
 			}
-			while (rs.next()) {
-				System.out.println(rs.getString("username"));
-				System.out.println(rs.getString("password"));
-			}
+//			while (rs.next()) {
+//				System.out.println(rs.getString("username"));
+//				System.out.println(rs.getString("password"));
+//			}
 			System.out.println();
 		} catch (SQLException sqle) {
 			System.out.println ("SQLException: " + sqle.getMessage());
@@ -101,7 +106,8 @@ public class SignupServlet extends HttpServlet {
 			} catch (SQLException sqle) {
 				System.out.println("sqle: " + sqle.getMessage());
 			}
-		}    	
+		}
+		return 1;    	
     	
     }
    
@@ -124,7 +130,7 @@ public class SignupServlet extends HttpServlet {
 
 			} 
 			//connects java to mysql
-			conn = DriverManager.getConnection("jdbc:mysql://35.226.126.153:3306/userBase?luke=root?");
+			conn = DriverManager.getConnection("jdbc:mysql://35.226.126.153:3306/userBase?user=root");
 			//https://www.herongyang.com/JDBC/Derby-ResultSet-insertRow.html
 			st = conn.createStatement();
 			rs = st.executeQuery("Select* from users;");
@@ -132,6 +138,7 @@ public class SignupServlet extends HttpServlet {
 			while (rs.next()) {
 				String tempUser = rs.getString("username");
 				String tempPass = rs.getString("password");
+				System.out.println(tempUser);
 				
 				if(tempUser.equals(user)) {
 					return false;

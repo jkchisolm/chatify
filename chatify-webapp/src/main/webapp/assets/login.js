@@ -12,7 +12,7 @@ const loginUser = async () => {
 
   //fetch
   const response = await fetch(
-    "/test-stuff/LoginServlet?user=" +
+    "/chatify-webapp/LoginServlet?user=" +
       username +
       "&pass=" +
       password,

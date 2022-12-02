@@ -16,7 +16,7 @@ const registerUser = async () => {
   }
 
   const response = await fetch(
-      "/test-stuff/SignupServlet?user=" +
+      "/chatify-webapp/SignupServlet?user=" +
       username +
       "&pass=" +
       password +
@@ -24,6 +24,14 @@ const registerUser = async () => {
       { method: "GET" }
   );
   const json = await response.json();
-  console.log(json);
-  // alert("Registered user (placeholder)");
+  if (json.status == 1) {
+    document.cookie = "username=" + json.username;
+    window.location.href = "countDown.html";
+  } else if (json.status == -1) {
+    alert("Username already exists");
+  } else if (json.status == -2) {
+    alert("Password must be 8 characters");
+  } else if (json.status == -3) {
+    alert("Username must be at least 4 characters");
+  }
 };
