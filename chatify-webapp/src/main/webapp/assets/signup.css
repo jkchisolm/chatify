@@ -1,4 +1,29 @@
+@keyframes bgcolor {
+  0% {
+    background-color: #45A3E5
+  }
+  30% {
+    background-color: #66BF39
+  }
+  60% {
+    background-color: #EB670F
+  }
+  90% {
+    background-color: #f35
+  }
+  100% {
+    background-color: #864CBF
+  }
+}
+
 body {
+  -webkit-animation: bgcolor 30s infinite;
+  animation: bgcolor 20s infinite;
+  -webkit-animation-direction: alternate;
+  animation-direction: alternate;
+  font-family: "Lato";
+  font-weight: 300;
+  background: blue;
   font-family: Arial, Helvetica, sans-serif;
   background-color: rgb(255, 255, 255);
   margin: 0;

@@ -25,6 +25,8 @@ const loginUser = async () => {
   } else {
     // Store username as cookie
     document.cookie = "username=" + json.Username;
-    window.location.href = "countDown.html";
+    // Re-auth user through Spotify
+    requestAuthorization();
+    // window.location.href = "countDown.html";
   }
 };

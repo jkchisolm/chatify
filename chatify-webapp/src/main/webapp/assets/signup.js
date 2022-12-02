@@ -1,4 +1,4 @@
-const onPageLoad = () => {
+const onSignupPageLoad = () => {
   // check if page url has a code parameter
   let code = null;
   const queryString = window.location.search;
@@ -7,7 +7,10 @@ const onPageLoad = () => {
     code = urlParams.get('code')
   }
   if (code != null) {
-    
+    console.log("code: " + code);
+    let user = document.cookie;
+    user = user.substring(user.indexOf("=") + 1);
+    fetchAccessToken(code, user);
   }
 }
 

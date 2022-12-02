@@ -9,22 +9,25 @@ var client_secret = "f9a787a2c6824a0898fb97ac3d2a6bb5";
 var redirect_uri = "http://localhost:8080/chatify-webapp/signup.html"; // get URI
 var access_token = null;
 var refresh_token = null;
-
-// JSON string that contains an array "items" of objects 
+// JSON string that contains an array "items" of objects
 // each object contains track title, artist name, and album cover image url
-var topTenTracks = "";
+let topTenTracks = "";
 
 // JSON string that contains an array "items" of objects
 // each object contains artist name and artist image url
-var topTenArtists = "";
+let topTenArtists = "";
 
 // JSON string
 // strings containing genre
-var topFiveGenres = ""; 
-const genreMap = new Map(); // key = genre; value = number of times it appears
+let topFiveGenres = "";
 
+let artistsFetched = false;
+let tracksFetched = false;
+let genresFetched = false;
 
-function onPageLoad() {
+let user = "";
+
+async function onPageLoad() {
     if (window.location.search.length > 0) {
         handleRedirect();
     } else {
@@ -37,6 +40,17 @@ function onPageLoad() {
             getUserTopArtists();
             getUserTopTracks();
             getUserTopGenres();
+
+            const response = await fetch("/myForm3",
+                "/?topTenTracks=" +
+                topTenTracks +
+                "&topTenArtists=" +
+                topTenArtists, +
+                    "&topFiveGenres", +
+                    topFiveGenres
+                ,{ method: "GET" }
+            );
+
         }
     }
 }
@@ -67,7 +81,8 @@ function requestAuthorization() {
     window.location.href = url; // show spotify's authorization screen
 }
 
-function fetchAccessToken(code) {
+function fetchAccessToken(code, username) {
+    user = username;
     let body = "grant_type=authorization_code";
     body += "&code=" + code;
     body += "&redirect_uri=" + encodeURI(redirect_uri);
@@ -85,7 +100,7 @@ function callAuthorizationApi(body) {
     xhr.onload = handleAuthorizationResponse;
 }
 
-function handleAuthorizationResponse() {
+async function handleAuthorizationResponse() {
     if (this.status == 200) {
         var data = JSON.parse(this.responseText);
         // console.log(data);
@@ -96,11 +111,34 @@ function handleAuthorizationResponse() {
         if (data.refresh_token != undefined) {
             refresh_token = data.refresh_token;
         }
-        onPageLoad();
+        await getUserTopGenres();
+        await getUserTopTracks();
+        await getUserTopArtists();
+        // console.log("topTenTracks: " + topTenTracks);
+
+        // send data to servlet
+        // const response = await fetch("/chatify-webapp/APIServlet?user=" + user + "&tracks=" + topTenTracks
+        //     + "&artists=" + topTenArtists + "&genres="
+        //     + topFiveGenres, { method: "GET" }).then(response => response.json());
     } else {
-        console.log(this.responseText);
-        alert(this.responseText);
+        // do nothing
+        // console.log(this.responseText);
+        // alert(this.responseText);
     }
+}
+
+async function sendDataToServlet() {
+    console.log("Posting to API servlet");
+    const response = await fetch("/chatify-webapp/APIServlet", { method: "POST", body:
+            topTenTracks + ", NEXT, " + topTenArtists + ", NEXT, " + topFiveGenres + ", NEXT, " + user });
+    const json = await response.json();
+    console.log("Posted to API servlet");
+    if (json.status == "success") {
+        window.location.href = "/chatify-webapp/chat.html";
+    } else {
+        alert("error");
+    }
+    // console.log(json);
 }
 
 function refreshAccessToken() {
@@ -110,7 +148,7 @@ function refreshAccessToken() {
     callAuthorizationApi(body);
 }
 
-function callApi(method, url, body, callback) {
+async function callApi(method, url, body, callback) {
     let xhr = new XMLHttpRequest();
     xhr.open(method, url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -120,44 +158,44 @@ function callApi(method, url, body, callback) {
 }
 
 // get user's recent favorite tracks
-function getUserTopTracks() {
-    callApi("GET", TOPTRACKS, null, userTopTracks); // short_term
+async function getUserTopTracks() {
+    await callApi("GET", TOPTRACKS, null, userTopTracks); // short_term
 }
 
 // get user's top 5 genres of all time
-function getUserTopGenres() {
-    callApi("GET", TOPTRACKSLONG, null, userTopArtists); //long_term
+async function getUserTopGenres() {
+    await callApi("GET", TOPTRACKSLONG, null, userTopArtists); //long_term
 }
 
 // get user's favorite artists of all time
-function getUserTopArtists() {
-    callApi("GET", TOPARTISTS, null, userTopArtists); //long_term
+async function getUserTopArtists() {
+    await callApi("GET", TOPARTISTS, null, userTopArtists); //long_term
 }
 
 // get user's all-time favorite artists (name and image)
 function userTopArtists() {
     if (this.status == 200) {
         var data = JSON.parse(this.responseText);
-        const items = data.items; //array of JSON objects 
+        const items = data.items; //array of JSON objects
         const topTen = [];
-        
-        // top artists 
+
+        // top artists
         if(items.length == 10) {
             for (let i = 0; i < items.length; i++) {
 
                 // parse each JSON object in the items array
                 var nameVar = "";
                 var imageUrl = "";
-    
+
                 // get artist's name
                 nameVar = (items[i]).name;
-    
+
                 // get artist image
                 const images = (items[i]).images;
                 if( (images != undefined) && (images.length != 0) ) {
                     imageUrl = images[0].url;
                 }
-    
+
                 // add artist's info to list
                 const obj = {name: nameVar, image: imageUrl};
                 // topTen.push(JSON.stringify(obj)); // <-- JSON OF JSON OBJECTS
@@ -165,13 +203,24 @@ function userTopArtists() {
             }
             const obj = {items: topTen};
             topTenArtists = JSON.stringify(obj);
+            artistsFetched = true;
+            console.log("topTenArtists: " + JSON.stringify(obj));
+            console.log(tracksFetched);
+            console.log(genresFetched);
+            if (tracksFetched && genresFetched) {
+                sendDataToServlet().then(r => console.log(r));
+            }
 
-            console.log(topTenArtists);
+            return JSON.stringify(obj);
+
+            // console.log(topTenArtists);
             var d = JSON.parse(topTenArtists);
             var i = d.items;
-            console.log(i[1].name);
+            // console.log(i[1].name);
         }
         else if(items.length == 15) {
+
+            const genreMap = new Map(); // key = genre; value = number of times it appears
 
             // get genres and the number of times they occur
             for(let i = 0; i < 15; i++) {
@@ -179,7 +228,7 @@ function userTopArtists() {
                 const genres = (items[i]).genres; // array of strings
                 for (let j = 0; j < genres.length; j++) {
                     if (genreMap.has(genres[j])) {
-                        genreMap.set( genres[j], (genreMap.get(genres[j]) + 1) ); 
+                        genreMap.set( genres[j], (genreMap.get(genres[j]) + 1) );
                     }
                     else {
                         genreMap.set(genres[j], 1);
@@ -191,10 +240,10 @@ function userTopArtists() {
             const topFiveKey = [];
             for(const [key, value] of genreMap) {
 
-                var max = 0; 
+                var max = 0;
                 var theKey = "";
                 for (const [key, value] of genreMap) {
-                    if(value > max) { 
+                    if(value > max) {
                         max = value;
                         theKey = key;
                     }
@@ -206,8 +255,13 @@ function userTopArtists() {
 
             const obj = {one: topFiveKey[0], two: topFiveKey[1], three: topFiveKey[2], four: topFiveKey[3], five: topFiveKey[4]};
             topFiveGenres = JSON.stringify(obj);
+            genresFetched = true;
+            console.log("topFiveGenres: " + JSON.stringify(obj));
+            if (tracksFetched && artistsFetched) {
+                sendDataToServlet().then(r => console.log(r));
+            }
 
-            console.log(topFiveGenres);
+            return JSON.stringify(obj);
         }
     } else if (this.status == 401) {
         refreshAccessToken();
@@ -223,16 +277,16 @@ function userTopTracks() {
         var data = JSON.parse(this.responseText);
         const items = data.items; //array of JSON objects (tracks)
         const topTen = [];
-        
+
         // top 10 songs in the past 4 weeks
         for (let i = 0; i < 10; i++) {
-            // const temp = []; 
+            // const temp = [];
 
             // get the track title
             var trackTitle = (items[i]).name;
 
             // get array of all artists' names
-            const artists = (items[i]).artists; 
+            const artists = (items[i]).artists;
             var artistName = artists[0].name; // only get the first artists' name for simplicity
 
             // get URL of album cover
@@ -247,11 +301,17 @@ function userTopTracks() {
         }
         const obj = {items: topTen};
         topTenTracks = JSON.stringify(obj);
-        console.log(topTenTracks);
-    } 
+        tracksFetched = true;
+        console.log("topTenTracks: " + JSON.stringify(obj));
+        if (genresFetched && artistsFetched) {
+            sendDataToServlet().then(r => console.log(r));
+        }
+        return JSON.stringify(obj);
+        // console.log(topTenTracks);
+    }
     else if (this.status == 401) {
         refreshAccessToken();
-    } 
+    }
     else {
         console.log(this.responseText);
         alert(this.responseText);

@@ -2,15 +2,29 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5ba533f-20cd-4391-9395-9ddee39de3b3" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Java_EE_6_Java_EE_6.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/APIServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SignupServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SignupServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chatify-webapp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/chatify-webapp.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/API/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/API/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/login.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/login.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/signup.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/signup.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/signup.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/signup.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/signup.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -26,6 +40,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false"
   }
 }]]></component>
@@ -37,7 +52,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1669940431965</updated>
-      <workItem from="1669940449538" duration="3591000" />
+      <workItem from="1669940449538" duration="12292000" />
     </task>
     <servers />
   </component>
