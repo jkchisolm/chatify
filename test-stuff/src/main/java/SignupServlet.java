@@ -1,5 +1,4 @@
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -13,12 +12,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 
-@WebServlet("/myForm2")
-public class myServlet2 extends HttpServlet {
+@WebServlet("/SignupServlet")
+public class SignupServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    public myServlet2() {
+    public SignupServlet() {
         super();
     }
     
@@ -58,9 +56,8 @@ public class myServlet2 extends HttpServlet {
 
 			    System.out.println(cnfe.getMessage());
 
-			} 
-			
-			conn = DriverManager.getConnection("jdbc:mysql://35.226.126.153:3306/userBase?user=luke?");
+			}
+			conn = DriverManager.getConnection("jdbc:mysql://35.226.126.153:3306/userBase?user=root");
 			//https://www.herongyang.com/JDBC/Derby-ResultSet-insertRow.html
 			st = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
 			        ResultSet.CONCUR_UPDATABLE);
