@@ -1,3 +1,16 @@
+const onPageLoad = () => {
+  // check if page url has a code parameter
+  let code = null;
+  const queryString = window.location.search;
+  if (queryString.length > 0) {
+    const urlParams = new URLSearchParams(queryString);
+    code = urlParams.get('code')
+  }
+  if (code != null) {
+    
+  }
+}
+
 const registerUser = async () => {
   let username = document.getElementById("username").value;
   let password = document.getElementById("password").value;
@@ -26,7 +39,9 @@ const registerUser = async () => {
   const json = await response.json();
   if (json.status == 1) {
     document.cookie = "username=" + json.username;
-    window.location.href = "countDown.html";
+    // Send users to authenticate with Spotify
+    requestAuthorization();
+    // window.location.href = "countDown.html";
   } else if (json.status == -1) {
     alert("Username already exists");
   } else if (json.status == -2) {

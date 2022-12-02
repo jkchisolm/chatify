@@ -22,7 +22,6 @@ public class SignupServlet extends HttpServlet {
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-//		response.getWriter().append("Served at: ").append(request.getContextPath());
 		PrintWriter out = response.getWriter();
 		String user = request.getParameter("user");
 		String pass = request.getParameter("pass");
@@ -138,7 +137,7 @@ public class SignupServlet extends HttpServlet {
 			while (rs.next()) {
 				String tempUser = rs.getString("username");
 				String tempPass = rs.getString("password");
-				System.out.println(tempUser);
+//				System.out.println(tempUser);
 				
 				if(tempUser.equals(user)) {
 					return false;
