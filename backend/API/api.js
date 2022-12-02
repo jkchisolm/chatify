@@ -21,10 +21,8 @@ var topTenArtists = "";
 // JSON string
 // strings containing genre
 var topFiveGenres = ""; 
-const genreMap = new Map(); // key = genre; value = number of times it appears
 
-
-function onPageLoad() {
+async function onPageLoad() {
     if (window.location.search.length > 0) {
         handleRedirect();
     } else {
@@ -37,6 +35,17 @@ function onPageLoad() {
             getUserTopArtists();
             getUserTopTracks();
             getUserTopGenres();
+
+            const response = await fetch("/myForm3",
+                "/test-stuff/LoginServlet?topTenTracks=" +
+                topTenTracks +
+                "&topTenArtists=" +
+                topTenArtists, + 
+                "&topFiveGenres", + 
+                topFiveGenres
+              ,{ method: "GET" }
+            );
+            
         }
     }
 }
@@ -166,12 +175,14 @@ function userTopArtists() {
             const obj = {items: topTen};
             topTenArtists = JSON.stringify(obj);
 
-            console.log(topTenArtists);
+            // console.log(topTenArtists);
             var d = JSON.parse(topTenArtists);
             var i = d.items;
-            console.log(i[1].name);
+            // console.log(i[1].name);
         }
         else if(items.length == 15) {
+
+            const genreMap = new Map(); // key = genre; value = number of times it appears
 
             // get genres and the number of times they occur
             for(let i = 0; i < 15; i++) {
@@ -207,7 +218,7 @@ function userTopArtists() {
             const obj = {one: topFiveKey[0], two: topFiveKey[1], three: topFiveKey[2], four: topFiveKey[3], five: topFiveKey[4]};
             topFiveGenres = JSON.stringify(obj);
 
-            console.log(topFiveGenres);
+            // console.log(topFiveGenres);
         }
     } else if (this.status == 401) {
         refreshAccessToken();
@@ -247,7 +258,7 @@ function userTopTracks() {
         }
         const obj = {items: topTen};
         topTenTracks = JSON.stringify(obj);
-        console.log(topTenTracks);
+        // console.log(topTenTracks);
     } 
     else if (this.status == 401) {
         refreshAccessToken();
